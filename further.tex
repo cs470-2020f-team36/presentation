@@ -1,0 +1,13 @@
+% !TeX root=main.tex
+\begin{frame}[fragile]
+  \frametitle{Further Suggestions \& Plans}
+
+  \begin{itemize}
+    \item Train more and more, and more!
+    \item Change hyperparameters and the reward function.
+    \item When sampling from $f_i^{-1}(f_i(g))$, we may use trainable sampler to make it learn the distribution of possible games from the given observation. This may make the sampling process more stable.
+    \item Use ISMCTS or $\alpha\mu$ search to handle incomplete information.
+    PIMC has been criticized due to its critical problems: strategy fusion and non-locality. By using other algorithms to handle hidden information, we may get a better result.
+    \item Or use different architecture like ReBeL to handle imperfect information better.
+  \end{itemize}
+\end{frame}

@@ -1,0 +1,188 @@
+% !TeX root=main.tex
+\usepackage[no-math]{fontspec}
+\usepackage{lmodern}
+\usepackage{kotex}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{relsize}
+\usepackage{dtk-logos}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage{minted}
+\usepackage{expl3}
+\usepackage{xparse}
+\usepackage{enumitem}
+\usepackage{forloop}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{pgfplots}
+% \usepackage{lua-visual-debug}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{positioning}
+\usetikzlibrary{graphdrawing.trees}
+\usetikzlibrary{arrows.meta}
+
+\usefonttheme{serif}
+\definecolor{darkgreen}{HTML}{3B7157}
+\definecolor{ddarkgreen}{HTML}{29604D}
+\definecolor{gostopred}{HTML}{FF002B}
+
+% setting some colors for the theme
+\setbeamercolor{frametitle}{fg=white,bg=darkgreen}
+\setbeamercolor{palette primary}{fg=white,bg=darkgreen}
+\setbeamercolor{palette secondary}{fg=white,bg=darkgreen}
+\setbeamercolor{structure}{fg=white,bg=darkgreen}
+\setbeamercolor{title in head/foot}{fg=white,bg=darkgreen}
+\setbeamercolor{date in head/foot}{fg=white,bg=darkgreen}
+\setbeamercolor{normal text}{fg=white}
+
+\setbeamerfont{frametitle}{family=\rmfamily,series=\bfseries}
+
+\newsavebox{\titlebox}
+\AtBeginSection[]{
+  \setbeamercolor{background canvas}{bg=darkgreen}
+  \begin{frame}
+  \vfill
+  \hspace*{\fill}%
+  \LARGE\bfseries%
+  \gostopemph{\textcolor{white}{\insertsectionhead}}%
+  \hspace*{\fill}%
+  \vfill
+  \end{frame}
+}
+\def\gostopemph#1{%
+  \sbox{\titlebox}{\vphantom{gl}#1}%
+  \hbox to \wd\titlebox{%
+    \rlap{\textcolor{gostopred}{\rule[-.37em]{\wd\titlebox}{.65em}}}%
+    \usebox{\titlebox}%
+  }%
+}
+
+\setlist[itemize,1]{label=\usebeamerfont*{itemize item}%
+  \usebeamercolor[fg]{itemize item}
+  \usebeamertemplate{itemize item}}
+\setlist[itemize,2]{label=\usebeamerfont*{itemize subitem}%
+  \usebeamercolor[fg]{itemize subitem}
+  \usebeamertemplate{itemize subitem}}
+\setlist[itemize,3]{label=\usebeamerfont*{itemize subsubitem}%
+  \usebeamercolor[fg]{itemize subsubitem}
+  \usebeamertemplate{itemize subsubitem}}
+\AtBeginEnvironment{minted}{\singlespacing\fontsize{9}{12}\selectfont}
+\newminted{latex}{breaklines=true,breaksymbolleft={}}
+\usemintedstyle{monokai}
+\setminted{bgcolor=ddarkgreen}
+\setmintedinline{fontsize=\small}
+
+\setstretch{1.3}
+\usetikzlibrary{shapes.geometric}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+	\leavevmode%
+  \hbox{%
+    \scriptsize
+		\begin{beamercolorbox}[wd=.17\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+			\usebeamerfont{author in head/foot}\insertshortauthor
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.7\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+			\usebeamerfont{title in head/foot}\insertshorttitle
+		\end{beamercolorbox}%
+		\begin{beamercolorbox}[wd=.13\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+			\insertframenumber{} / \inserttotalframenumber\hspace*{1ex}
+	\end{beamercolorbox}}%
+	\vskip0pt%
+}
+
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+% definition of the title page template
+\defbeamertemplate*{title page}{mytheme}[1][]
+{%
+  \begin{tikzpicture}[background rectangle/.style={fill=darkgreen}, show background rectangle,remember picture,overlay]
+  \fill[gostopred] ($(current page.west) + (7mm, 10mm)$) rectangle ($(current page.west) + (61.5mm, 17mm)$);
+  \node[text=white,anchor=center,text width=\paperwidth] 
+  at ($(current page.center) + (8mm, 0)$)
+  (title)
+  {\rm\Huge\textbf{AlphaGoStop}\\[7mm]\Large Applying Deep Reinforcement Learning\\[-2mm] for Playing Go-Stop\\[8mm] Team 36 \normalsize (Keonwoo Kim, 20170058)};
+  \end{tikzpicture}%
+}
+
+
+\ifPDFTeX
+  \PackageError{MathLetter}{%
+      PDFTeX is not allowed to set fonts!
+  }{%
+      Use another engine, such as XeLaTeX or LuaLaTeX.
+  }
+\fi
+\setmainfont{Playfair Display}[
+Extension=.ttf,
+UprightFont=*-Regular,
+ItalicFont=*-Italic,
+BoldFont=*-SemiBold,
+BoldItalicFont=*-SemiBoldItalic,
+]
+\setsansfont{Noto Sans CJK KR}[Scale=0.90,ItalicFont={*},ItalicFeatures={FakeSlant=.167}]
+\setmainhangulfont[Scale=0.90]{Noto Serif CJK KR}
+\setmainhangulfont
+  [Scale=0.90,ItalicFont={*},ItalicFeatures={FakeSlant=.167}]
+  {Noto Serif CJK KR}
+\setsanshangulfont[Scale=0.90]{Noto Sans CJK KR}
+\setsanshangulfont
+  [ItalicFont={*},ItalicFeatures={FakeSlant=.167}]
+  {Noto Sans CJK KR}[Scale=0.90]
+\setmonohangulfont{Noto Sans Mono CJK KR}
+\setmonohangulfont
+  [Scale=0.90,ItalicFont={*},ItalicFeatures={FakeSlant=.167}]
+  {Noto Sans Mono CJK KR}
+
+% remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{color0}{HTML}{FEABB7}
+\definecolor{color1}{HTML}{9797B9}
+\definecolor{color2}{HTML}{4B7AA3}
+
+% definition of the symbols used in itemize
+\newcommand\mysymbol{%
+  \begin{tikzpicture}[xscale=0.85]
+    \draw (1.75ex,0) node[star, star points=5, star point ratio=2.25, inner sep=1.3pt,anchor=outer point 3,fill=gostopred] {};          
+  \end{tikzpicture}%
+}
+\newcommand\mysymboli{%
+  \begin{tikzpicture}[xscale=0.85]
+    \draw (1.75ex,0) node[star, star points=5, star point ratio=2.25, inner sep=1.3pt,anchor=outer point 3,fill=color0] {};          
+  \end{tikzpicture}%
+}
+\newcommand\mysymbolii{%
+  \begin{tikzpicture}[xscale=0.85]
+    \draw (1.75ex,0) node[star, star points=5, star point ratio=2.25, inner sep=1.3pt,anchor=outer point 3,fill=color2] {};          
+  \end{tikzpicture}%
+}
+
+% definition of the itemize templates
+\defbeamertemplate*{itemize item}{mysymbol}{\small\raise-0.5pt\hbox{\mysymbol}}
+\defbeamertemplate*{itemize subitem}{mysymbol}{\footnotesize\raise-0.5pt\hbox{\mysymboli}}
+\defbeamertemplate*{itemize subsubitem}{mysymbol}{\footnotesize\raise-0.5pt\hbox{\mysymbolii}}
+
+\title{AlphaGoStop: Applying Deep Reinforcement Learning for Playing Go-Stop}
+\author{Team 36}
+\date{}
+
+\institute{}
+
+
+\newcommand*{\vcenteredhbox}[1]{\begingroup
+\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}

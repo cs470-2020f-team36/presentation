@@ -1,0 +1,88 @@
+% !TeX root=main.tex
+
+\pgfplotsset{
+  error bars/error mark options={line width=1pt,mark size=2pt,rotate=90}
+  % OR more low-level
+  % error bars/draw error bar/.code 2 args = {\draw #1 -- #2;}
+}
+
+\pgfplotstableread{
+x           y         err
+0 5.272985128 0.034701895
+1 5.135427035 0.080204846
+2 5.046737598 0.093909840
+3 5.048029741 0.103350128
+4 4.996013067 0.123958131
+}{\losstable}
+
+\pgfplotstableread{
+x  y      ndrate
+0 0.08 0.55
+1 -0.263 0.5825
+2 0.748 0.6075
+3 2.2   0.59
+4 1.195 0.593
+}{\scoretable}
+
+\begin{frame}[fragile]
+  \frametitle{Quantitative Result: AlphaGoStop vs. Random}
+  
+
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+  \begin{tikzpicture}
+    \begin{axis} [
+      width=\textwidth,
+      height=4cm,
+      xtick=data,
+      xmin=-0.5,
+      axis y line*=left,
+      xlabel={$\#$ Evolution},
+      title={Mean score ($\bullet$) / Non-defeat rate ($\circ$)}
+    ]
+    \addplot [color=darkgreen!50!white, mark=*, mark options={fill=white}]
+      plot [error bars/.cd, y dir=both, y explicit]
+      table {\scoretable};
+    \end{axis} 
+    \begin{axis} [
+      width=\textwidth,
+      height=4cm,
+      xtick=data,
+      xmin=-0.5,
+      xmax=4.5,
+      axis y line*=right,
+      axis x line=none
+    ]
+    \addplot [color=darkgreen!50!white, mark=o, mark options={fill=white}]
+      plot [error bars/.cd, y dir=both, y explicit]
+      table [y=ndrate] {\scoretable};
+    \end{axis} 
+  \end{tikzpicture}
+\end{column}
+\begin{column}{0.55\textwidth}
+  \begin{tikzpicture}
+  \begin{axis} [
+    width=\textwidth,
+    height=4cm,
+    xtick=data,
+    xmin=-0.5,
+    xmax=4.5,
+    xlabel={$\#$ Evolution},
+    title={Loss}
+  ]
+  \addplot [color=darkgreen!50!white, mark=*, mark options={fill=white}]
+    plot [error bars/.cd, y dir=both, y explicit]
+    table [y error=err] {\losstable};
+  \end{axis} 
+  \end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Live Demo}
+
+  \begin{center}
+    \LARGE\url{https://gostop.kanu.kim}
+  \end{center}
+\end{frame}

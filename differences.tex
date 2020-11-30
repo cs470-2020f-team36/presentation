@@ -1,0 +1,81 @@
+% !TeX root=main.tex
+\begin{frame}[fragile]
+  \frametitle{PIMC: Perfect Information Monte--Carlo}
+  \framesubtitle{Run MCTS on Games with Hidden Information}
+
+  As Go-Stop is a game with \gostopemph{hidden information}, the neural net must not obtain the full state of the game.
+
+  $$ \hskip-7pt {\mathop{\text{\Large $g$}}\limits_{\text{game state}}} \xrightarrow[\text{observation}]{\quad f_{i}\quad} {\mathop{\text{\Large $f_i(g)$}}\limits_{\substack{\text{state observable}\\[0.3em]\text{to player $i$}}}} \xrightarrow{\quad f_i^{-1}\quad} {\mathop{\text{\Large $f^{-1}_i(f_i(g))$}}\limits_{\substack{\text{the set of states}\\[0.3em]\text{that seem identical to $i$}}}}\longrightarrow \ {\mathop{\text{\Large $\mathcal D(g)$}}\limits_{\text{a sample}}} $$
+
+  \vspace{1em}
+
+  We sampled some games from $f_i^{-1}(f_i(g))$ randomly and ran MCTS with those games at each step of MCTS.
+\end{frame}
+
+\tikzstyle{block} = [draw, fill=white, rectangle, 
+    minimum height=3em, text width=0.6em, text=ddarkgreen]
+\tikzstyle{smallblock} = [draw, fill=white, rectangle, 
+    minimum height=1.3em, text width=0.6em, text=ddarkgreen]
+\tikzstyle{sum} = [draw, fill=white, circle, text=ddarkgreen, text width=0.6em, minimum height=1.3em]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-,thin,black}]
+
+\begin{frame}[fragile]
+  \frametitle{Network Layers}
+  \framesubtitle{(for now)}
+
+  As Go-Stop boards have \gostopemph{no geometric properties}, it is weird to use convolutional layers in the network. Instead, we replaced them with \gostopemph{fully connected layers}.
+
+  \vspace*{-1em}
+
+  \small
+  \begin{tikzpicture}[auto, node distance=5em]
+    % We start by placing the blocks
+    \node [input, name=input] {};
+    \node [block, right=5em of input, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{inp}\\[-0.5em]
+      \text{out: }n_\text{hid}\\[-0.5em]
+    \end{matrix}$}] (fc1) {\!\!FC};
+    \node [block, right of=fc1, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }n_\text{hid}\\[-0.5em]
+    \end{matrix}$}] (fc2) {\!\!FC};
+    \node [block, right of=fc2, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }n_\text{hid}\\[-0.5em]
+    \end{matrix}$}] (fc7) {\!\!FC};
+    \node [block, above right=2em and 4em of fc7, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }n_\text{hid}\\[-0.5em]
+    \end{matrix}$}] (fcp1) {\!\!FC};
+    \node [block, right of=fcp1, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }n_\text{pol}\\[-0.5em]
+    \end{matrix}$}] (fcp2) {\!\!FC};
+    \node [sum, right of=fcp2, label={[yshift=0.3em]softmax}] (fcps) {};
+    \node [output, right=3em of fcps] (p) {};
+    \node [block, below=of fcp1, label={[yshift=0.3em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }n_\text{hid}\\[-0.5em]
+    \end{matrix}$}] (fcv1) {\!\!FC};
+    \node [smallblock, below=of fcp2, label={$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }1\\
+    \end{matrix}$}] (fcv2) {\!\!FC};
+    \node [smallblock, below=2em of fcv2, label={[yshift=-4.5em]$\begin{matrix}
+      \text{in: }n_\text{hid}\\[-0.5em]
+      \text{out: }1\\
+    \end{matrix}$}] (fcv3) {\!\!FC};
+    \node [sum, right of=fcv2] (fcvp) {+};
+    \node [sum, right of=fcv3, label={[yshift=-3em]$\tanh$}] (fcvt) {};
+    \node [output, right=3em of fcvp] (v) {};
+
+    \draw [draw,->] (input) -- node [pos=0.2] {$f_i(g)$} (fc1);
+    \draw [draw,->] (fc1) -- (fc2);
+    \path (fc2) -- node[auto=false]{\ldots} (fc7);
+    \draw [draw,->] (fc7) -- (fcp1) -- (fcp2) -- (fcps) -- node[pos=0.9] {$\pi$} (p);
+    \draw [draw,->] (fc7) -- (fcv1) -- (fcv2) -- (fcvp) -- node[pos=0.9] {$v$} (v);
+    \draw [draw,->] (fcv1) -- (fcv3) -- (fcvt) -- (fcvp);
+  \end{tikzpicture}
+\end{frame}

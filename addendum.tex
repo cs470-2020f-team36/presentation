@@ -1,0 +1,173 @@
+% !TeX root=main.tex
+\begin{frame}[fragile]
+  \frametitle{Implementation Details}
+  \framesubtitle{Hyperparameters (for now)}
+
+  \begin{itemize}
+    \item Batch size $B = 32$,
+    \item Input dimension $n_\text{inp} = 307$,
+    \item Hidden dimension $n_\text{hid} = 256$,
+    \item Policy output dimension $n_\text{pol} = 167$,
+    \item Learning rate: $0.1 \cdot 0.95^{\max(0, j - 9)}$,
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementation Details}
+  \framesubtitle{Hyperparameters (for now)}
+
+  \begin{itemize}
+    \item $\epsilon = 0.25$, $\alpha = 1$ (Dirichlet noise),
+    \item $\#$ of search in one MCTS simulation: $96$,
+    \item $\#$ of simulations in one network update: $30$,
+    \begin{itemize}
+      \item This gives about 600 data triples per update.
+    \end{itemize}
+    \item PUCT constant $c_\text{puct} = 1$,
+    \item Temperature parameter $\tau^{(j)} = 1\text{ if }j < 10\text{ else }0.1$,
+    \item The size of a sample $\mathcal D(g)$ from $f_i^{-1}(f_i(g))$: $n_\text{samp}^{(j)} = \max(\lfloor 2^{7.5 - j / 8} \rfloor, 4)$,
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Special cards}
+
+  \begin{itemize}
+    \item The following cards are called \gostopemph{bonus cards}, and they are treated as junk cards whose valued are $2$- or $3$ times of normal junk cards, resp.
+    \begin{center}
+      \vspace*{-.5em}
+      \includegraphics[width=1.5em]{images/cards/bonus2}\quad \includegraphics[width=1.5em]{images/cards/bonus3}
+      \vspace*{.5em}
+    \end{center}
+    \item The values of the following junk cards are double of normal ones'.
+    \begin{center}
+      \vspace*{-.5em}
+      \includegraphics[width=1.5em]{images/cards/J112}\quad \includegraphics[width=1.5em]{images/cards/J120}
+      \vspace*{.5em}
+    \end{center}
+    \item The animal card of September \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/A09}} can be used as a double junk card, and it can be moved only once in a game, usually when the player declares Go or Stop.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Throwing a Bomb}
+
+  \begin{itemize}
+    \item When there are 3 (or 2) cards of the same month and there are 1 (or 2) card(s) of the same month on the center field, then the player can \gostopemph{throw a bomb}, meaning that throwing all 3 (or 2) cards simultaneously. The player obtains 2 (or 1) chances to flip the top card without throwing a card from their hand at their turn. The player takes those 4 cards of the same month and an additional junk card from the opponent, if possible.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Flipping}
+
+  \begin{itemize}
+    \item When the flipped card was a \gostopemph{bonus card}, the player can flip the next top card once more and they takes an additional junk card which the opponent captured.
+    \item When a player threw a card without matches on the center field and then the flipped card was matched with the card thrown, it is called a \gostopemph{discard-and-match}. The player takes those cards and an additional junk card from the opponent.
+    \item When a player threw a card with one matched card on the center field and then the flipped card was again matched with the card thrown, it is called a \gostopemph{stacking}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Flipping}
+
+  \begin{itemize}
+    \item When a player threw a card with two matched cards on the center field and then the flipped card was again matched with the card thrown, it is called a \gostopemph{\textit{ttadak}}. The player takes those four cards of the same month and an additional junk card from the opponent.
+    \item When the center field was cleared after one's turn, it is called \gostopemph{clearing} and the player taken the last turn takes an additional junk card from the opponent.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Go and Stop}
+
+  \begin{itemize}
+    \item When either the temporary score of a player (refer to the next slide) is $\ge 7$ and they did not declare `Go' yet, or the temporary score of a player has incrased since the last declaration of `Go' in the other cases, the player can declare `Go' (again) or `Stop.'
+    \item When the player declared `Stop,' the game is over and the winner calculates the final score (refer to the next slide.)
+    \item When the player declared `Go,' the game continues.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Calculation of Scores}
+
+  \begin{itemize}
+    \item There are two kinds of score factors: additive ones and multiplicative ones.
+    \item We calculate \gostopemph{the temporary score} by adding all the additive scores.
+    \item The temporary score is used to decide whether a player can declare `Go' or `Stop.'
+    \item We calculate \gostopemph{the final score} by multiplying the other factors to the temporary score.
+    \item Go-Stop is a \gostopemph{zero-sum game}, meaning that the loser's score is the same with the winner's score multiplied by $-1$. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Additive Score Factors}
+
+  \begin{itemize}
+    \item When a player captured $n$ junk cards, its score is $\max(0, n - 9)$. Double junks and triple junks are counted as $2$ and $3$ cards, following the multiplicity of them.
+    \item When a player captured $n$ ribbon cards, its score is $\max(0, n - 4)$.
+    \item When a player captured $n$ animal cards, its score is $\max(0, n - 4)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Additive Score Factors}
+
+  \begin{itemize}
+    \item When a player captured $3$ bright cards with the bright of December \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/B12}}, it worths $2$ points.
+    \item When a player captured $3$ bright cards without the bright of December \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/B12}}, it worths $3$ points.
+    \item When a player captured $4$ bright cards, it worth $4$ points.
+    \item When a player captured $5$ bright cards, it worth $15$ points.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Additive Score Factors}
+
+  \begin{itemize}
+    \item When a player captured all blue ribbons \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R06}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R09}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R10}}, it worths $3$ points.
+    \item When a player captured all red ribbons \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R01}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R02}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R03}}, it worths $3$ points.
+    \item When a player captured all plant ribbons \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R04}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R05}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/R07}}, it worths $3$ points.
+    \item When a player captured all \textit{five birds} cards \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/A02}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/A04}} \raisebox{-.8em}{\includegraphics[width=1.5em]{images/cards/A08}}, it worths $5$ points.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Additive Score Factors}
+
+  \begin{itemize}
+    \item When a player declared `Go' $n$ times, it worths $n$ points.
+    \item When there was a \gostopemph{four of a month} in one's hand (all 4 cards of the same month were in one's hand,) then the game ends and the player having the four of a month gets 10 points. If both players had those, then nullify the game.
+    \item When a player made \gostopemph{three stackings}, then the player wins with $10$ points (without counting any other additive score factors).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Multiplicative Score Factors}
+
+  \begin{itemize}
+    \item When a player declared `Go' $n$ times, the score is multiplied by $2^{\max(0, n - 2)}$. (Together with the additional scores.)
+    \item When the winner \textit{shaked} or \textit{threw a bomb} $n$ times, the score is multiplied by $2^n$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{How to Play}
+  \framesubtitle{Multiplicative Score Factors}
+
+  \begin{itemize}
+    \item When the winner has captured $3$ or more bright cards and the opponent has no bright cards, it is called \gostopemph{bright penalty} and the score is multiplied by 2.
+    \item When the winner has captured $7$ or more animal cards, it is called \gostopemph{animal penalty} and the score is multiplied by 2.
+    \item When the winner has captured $10$ or more junk cards and the opponent has $\le 7$ junk cards, it is called \gostopemph{junk penalty} and the score is multiplied by 2.
+    \item When the loser had declared `Go' at least once before, it is called \gostopemph{go penalty} and the score is multiplied by 2.
+  \end{itemize}
+\end{frame}
